@@ -1,14 +1,13 @@
-package com.vnext.controller;
+package com.vnext.demo.controller;
 
 import com.vnext.mvcframework.annotation.MyAutowired;
 import com.vnext.mvcframework.annotation.MyController;
 import com.vnext.mvcframework.annotation.MyRequestMapping;
 import com.vnext.mvcframework.annotation.MyRequestParam;
-import com.vnext.service.DemoService;
+import com.vnext.demo.service.DemoService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.Result;
 import java.io.IOException;
 
 /**

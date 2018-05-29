@@ -1,4 +1,4 @@
-package com.vnext.service;
+package com.vnext.demo.service;
 
 import com.vnext.mvcframework.annotation.MyService;
 

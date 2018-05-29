@@ -128,12 +128,14 @@ public class MyDispatcherServlet extends HttpServlet {
                 MyAutowired autowired = field.getAnnotation(MyAutowired.class);
                 String beanName = autowired.value().trim();
                 if ("".equals(beanName)) {
+                    // 如果beanName是默认值的话
                     beanName = field.getType().getName();
                 }
                 // 想要访问到私有的，或者受保护的，我们强制授权访问
                 field.setAccessible(true);
                 try {
-                    field.set(entry.getValue(), ioc.get(beanName));
+                    //field.set(entry.getValue(), ioc.get(beanName));
+                    field.set(entry.getValue(), ioc.get("demoService"));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                     continue;
@@ -159,7 +161,7 @@ public class MyDispatcherServlet extends HttpServlet {
                 //3.如果是接口的话，我们可以巧用接口类作为key
 
                 if (clazz.isAnnotationPresent(MyController.class)) {
-                    String beanName = clazz.getSimpleName();
+                    String beanName = lowerFirstCase(clazz.getSimpleName());
                     ioc.put(beanName, clazz.newInstance());
 
                 } else if (clazz.isAnnotationPresent(MyService.class)) {
@@ -167,6 +169,7 @@ public class MyDispatcherServlet extends HttpServlet {
                     MyService service = clazz.getAnnotation(MyService.class);
                     String beanName = service.value();
                     if ("".equals(beanName.trim())) {
+                        // 如果等于空，用默认的数据
                         beanName = lowerFirstCase(clazz.getSimpleName());
                     }
                     Object instance = clazz.newInstance();
