@@ -89,9 +89,9 @@ public class MyDispatcherServlet extends HttpServlet {
                 baseUrl = requestMapping.value();
             }
 
-            // --------------
-//            Method[] methods = clazz.getMethods();
-//            for (Method method : methods) {
+            // ================base================
+//            Method[] ms = clazz.getMethods();
+//            for (Method method : ms) {
 //                if (!method.isAnnotationPresent(MyRequestMapping.class)) continue;
 //                MyRequestMapping requestMapping = method.getAnnotation(MyRequestMapping.class);
 //                String url = (baseUrl + requestMapping.value()).replaceAll("/+", "/");
@@ -99,7 +99,7 @@ public class MyDispatcherServlet extends HttpServlet {
 //                System.out.println("Mapping:" + url + "," + method);
 //            }
 
-            //===========
+            //======================================
             // 获取method的url配置
             Method[] methods = clazz.getMethods();
             for (Method method : methods) {
@@ -109,7 +109,7 @@ public class MyDispatcherServlet extends HttpServlet {
                 MyRequestMapping requestMapping = method.getAnnotation(MyRequestMapping.class);
                 String regex = ("/" + baseUrl + requestMapping.value()).replaceAll("/+", "/");
                 Pattern pattern = Pattern.compile(regex);
-                handlerMappingList.add(new Handler(entry.getValue(),method,pattern));
+                handlerMappingList.add(new Handler(entry.getValue(), method, pattern));
                 System.out.println("Mapping:" + regex + "," + method);
             }
 
@@ -135,7 +135,9 @@ public class MyDispatcherServlet extends HttpServlet {
                 field.setAccessible(true);
                 try {
                     //field.set(entry.getValue(), ioc.get(beanName));
+                    System.out.println("beanName=======" + beanName);
                     field.set(entry.getValue(), ioc.get("demoService"));
+                    //field.set(entry.getValue(), ioc.get(beanName));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                     continue;
@@ -223,18 +225,20 @@ public class MyDispatcherServlet extends HttpServlet {
     // 运行时阶段要执行的方法
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        //super.doPost(req, resp);
+
+        //------------------base-------------------
 //        String url = req.getRequestURI();
 //        String contextPath = req.getContextPath();
 //        url = url.replace(contextPath, "").replaceAll("/+", "/");
 //        if (!handlerMapping.containsKey(url)) {
 //            resp.getWriter().write("404 NOT Found!");
+//            return;
 //        }
 //        Method method = handlerMapping.get(url);
 //        System.out.println("method=" + method);
 
         // 反射的方法：
-        // 需要两个参数，第一个拿到这个method的instance；第二个参数，要拿到实参，从request中取值
+        // 需要两个参数,第一个拿到这个method的instance; 第二个参数,要从request中拿到实参.
         // method.invoke()
 
         //-----------------------------------------
@@ -273,8 +277,8 @@ public class MyDispatcherServlet extends HttpServlet {
                 // 如果找到匹配的对象，则开始填充参数值
                 if (!handler.paramIndexMapping.containsKey(param.getKey())) continue;
                 int index = handler.paramIndexMapping.get(param.getKey());
-                //paramValues[index] = convert(paramTypes[index], value);
-                paramValues[index] = castStringValue(value,paramTypes[index]);
+                paramValues[index] = convert(paramTypes[index], value);
+                //paramValues[index] = castStringValue(value,paramTypes[index]);
 
             }
 
@@ -289,6 +293,12 @@ public class MyDispatcherServlet extends HttpServlet {
             throw e;
         }
 
+    }
+    private Object convert(Class<?> type,String value){
+        if(type == Integer.class){
+            return Integer.valueOf(value);
+        }
+        return value;
     }
 
     // 类型转换
@@ -326,13 +336,13 @@ public class MyDispatcherServlet extends HttpServlet {
     /**
      * Handler 记录Controller中的RequestMapping和Method的对应关系
      */
-    class Handler {
+    private class Handler {
         protected Object controller;  // 保存方法对应的实例
         protected Method method;      // 保存映射的方法
         protected Pattern pattern;
         protected Map<String, Integer> paramIndexMapping; // 参数顺序
 
-        public Handler(Object controller, Method method, Pattern pattern) {
+        protected Handler(Object controller, Method method, Pattern pattern) {
             this.controller = controller;
             this.method = method;
             this.pattern = pattern;
@@ -352,19 +362,15 @@ public class MyDispatcherServlet extends HttpServlet {
                         }
                     }
                 }
-
-                // 提取方法中的request和response参数
-                Class<?>[] parameterTypes = method.getParameterTypes();
-                for (int j = 0; j < parameterTypes.length; j++) {
-                    Class<?> parameterType = parameterTypes[j];
-                    if (parameterType == HttpServletRequest.class || parameterType == HttpServletResponse.class){
-                        paramIndexMapping.put(parameterType.getName(),i);
-                    }
+            }
+            // 提取方法中的request和response参数
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            for (int j = 0; j < parameterTypes.length; j++) {
+                Class<?> parameterType = parameterTypes[j];
+                if (parameterType == HttpServletRequest.class || parameterType == HttpServletResponse.class){
+                    paramIndexMapping.put(parameterType.getName(),j);
                 }
-
             }
         }
     }
-
-
 }

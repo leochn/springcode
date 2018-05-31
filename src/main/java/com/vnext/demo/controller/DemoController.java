@@ -25,6 +25,7 @@ public class DemoController {
     @MyRequestMapping("/query.json")
     public void query(HttpServletRequest request , HttpServletResponse response,
                       @MyRequestParam("name") String name){
+        System.out.println("query.json..........................");
         String result = demoService.get(name);
 
         try {

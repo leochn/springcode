@@ -10,6 +10,8 @@ import com.vnext.mvcframework.annotation.MyService;
 @MyService
 public class DemoService {
 
+    private String str = "hello";
+
     public String get(String name){
         return "My name is " + name;
     }
