@@ -127,17 +127,18 @@ public class MyDispatcherServlet extends HttpServlet {
                 if (!field.isAnnotationPresent(MyAutowired.class)) continue;
                 MyAutowired autowired = field.getAnnotation(MyAutowired.class);
                 String beanName = autowired.value().trim();
+
                 if ("".equals(beanName)) {
+                    // 如果 @MyAutowired 上没有自定义名字
                     // 如果beanName是默认值的话
-                    beanName = field.getType().getName();
+                    beanName = field.getName();
                 }
                 // 想要访问到私有的，或者受保护的，我们强制授权访问
                 field.setAccessible(true);
                 try {
-                    //field.set(entry.getValue(), ioc.get(beanName));
                     System.out.println("beanName=======" + beanName);
-                    field.set(entry.getValue(), ioc.get("demoService"));
-                    //field.set(entry.getValue(), ioc.get(beanName));
+                    //field.set(entry.getValue(), ioc.get("demoService"));
+                    field.set(entry.getValue(), ioc.get(beanName));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                     continue;

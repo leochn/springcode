@@ -22,6 +22,8 @@ public class DemoController {
     @MyAutowired
     private DemoService demoService;
 
+    private String pName;
+
     @MyRequestMapping("/query.json")
     public void query(HttpServletRequest request , HttpServletResponse response,
                       @MyRequestParam("name") String name){
